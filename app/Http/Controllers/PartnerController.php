@@ -14,7 +14,8 @@ class PartnerController extends Controller
     public function indexAll(){
         $data = Partner::with(['user'])
                 ->orderBy('created_at', 'DESC')
-                ->get();
+                ->get()
+                ->withQueryString();
         return PartnerResource::collection($data);
     }
 

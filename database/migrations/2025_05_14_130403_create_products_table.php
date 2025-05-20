@@ -22,6 +22,7 @@ return new class extends Migration
             $table->mediumInteger('price')->nullable();
             $table->mediumInteger('quantity')->nullable();
             $table->string('status')->nullable();
+            $table->integer('priority')->nullable();
             $table->timestamps();
         });
     }

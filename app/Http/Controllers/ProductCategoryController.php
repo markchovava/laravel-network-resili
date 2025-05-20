@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductCategoryResource;
+use App\Http\Resources\ProductResource;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +40,18 @@ class ProductCategoryController extends Controller
         return response()->json([
             'data' => ProductCategoryResource::collection($data)
         ]);
+    }
+
+     public function indexByCategory($id) {
+        $productIds = ProductCategory::with(['product', 'category', 'user'])
+                ->where('category_id', $id)
+                ->orderBy('updated_at', 'DESC')
+                ->pluck('product_id');
+        $data = Product::with(['user', 'product_images'])
+                ->whereIn('id', $productIds)
+                ->orderBy('updated_at', 'DESC')
+                ->paginate(12);
+        return ProductResource::collection($data);
     }
 
     public function view($id) {

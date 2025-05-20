@@ -6,6 +6,7 @@ use App\Http\Resources\ProductImageResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductSpecResource;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\ProductImage;
 use App\Models\ProductSpec;
 use Illuminate\Http\Request;
@@ -16,16 +17,100 @@ class ProductController extends Controller
 {
     public $upload_location = 'assets/img/product/';
 
+    public function indexBySort($sort){
+        switch($sort) {
+            case 'AscByName':
+                $data = Product::orderBy('name', 'ASC')
+                        ->orderBy('updated_at', 'DESC')
+                        ->paginate(12);
+                return ProductResource::collection($data);
+                break;
+            case 'DescByName':
+                $data = Product::orderBy('name', 'DESC')
+                        ->orderBy('updated_at', 'DESC')
+                        ->paginate(12);
+                return ProductResource::collection($data);
+                break;
+            case 'AscByPrice':
+                 $data = Product::orderBy('price', 'ASC')
+                        ->orderBy('updated_at', 'DESC')
+                        ->paginate(12);
+                return ProductResource::collection($data);
+                break;
+            case 'DescByPrice':
+                $data = Product::orderBy('price', 'DESC')
+                        ->orderBy('updated_at', 'DESC')
+                        ->paginate(12);
+                return ProductResource::collection($data);
+                break;
+            default:
+                $data = Product::with(['user'])
+                        ->orderBy('updated_at', 'DESC')
+                        ->paginate(12);
+                return ProductResource::collection($data);
+        }
+    }
+
+    public function searchNameCategory(Request $request){
+        $search = $request->search;
+        $category_id = $request->category_id;
+        $data = [];
+        if(!empty($search) && !empty($category_id)) {
+            $productIds = ProductCategory::where('category_id', $category_id)
+                    ->pluck('product_id');
+            $data = Product::with(['user'])
+                    ->whereIn('id', $productIds)
+                    ->where('name', 'LIKE', '%' . $search . '%')
+                    ->orderBy('updated_at', 'DESC')
+                    ->paginate(12)
+                    ->withQueryString();
+        }
+        if(!empty($search) && empty($category_id)) {
+            $data = Product::with(['user'])
+                    ->where('name', 'LIKE', '%' . $search . '%')
+                    ->orderBy('updated_at', 'DESC')
+                    ->paginate(12)
+                    ->withQueryString();
+        }
+        if(empty($search) && !empty($category_id)) {
+            $productIds = ProductCategory::where('category_id', $category_id)
+                        ->pluck('product_id');
+            $data = Product::with(['user'])
+                    ->whereIn('id', $productIds)
+                    ->orderBy('updated_at', 'DESC')
+                    ->paginate(12)
+                    ->withQueryString();
+        }
+        if(empty($search) && empty($category_id)) {
+            $data = Product::with(['user'])
+                    ->orderBy('updated_at', 'DESC')
+                    ->paginate(12)
+                    ->withQueryString();
+        }
+        return ProductResource::collection($data);
+    }
+
+    public function indexPriority(){
+        $data = Product::with(['user', 'product_images'])
+                ->orderBy('priority', 'ASC')
+                ->paginate(8)
+                ->withQueryString();
+        return ProductResource::collection($data);
+    }
+
     public function indexAll(){
         $data = Product::with(['user'])
-                ->orderBy('updated_at', 'DESC')->get();
+                ->orderBy('updated_at', 'DESC')
+                ->get()
+                ->withQueryString();
         return ProductResource::collection($data);
     }
 
     public function index(){
         $data = Product::with(['user'])
                 ->orderBy('updated_at', 'DESC')
-                ->paginate(12);
+                ->paginate(12)
+                ->withQueryString();;
         return ProductResource::collection($data);
     }
 
@@ -33,7 +118,8 @@ class ProductController extends Controller
         $data = Product::with(['user'])
                 ->where('name', 'LIKE', '%' . $search . '%')
                 ->orderBy('updated_at', 'DESC')
-                ->paginate(12);
+                ->paginate(12)
+                ->withQueryString();;
         return ProductResource::collection($data);
     }
 
@@ -47,8 +133,9 @@ class ProductController extends Controller
         $data->price = $request->price;
         $data->quantity = $request->quantity;
         $data->status = $request->status;
-        $data->created_at = now();
+        $data->priority = $request->priority;
         $data->updated_at = now();
+        $data->created_at = now();
         $data->save();
         /* PRODUCT SPECIFICATIONS */
         if($request->product_specs){
@@ -98,7 +185,7 @@ class ProductController extends Controller
         $data->price = $request->price;
         $data->quantity = $request->quantity;
         $data->status = $request->status;
-        $data->created_at = now();
+        $data->priority = $request->priority;
         $data->updated_at = now();
         $data->save();
         ProductSpec::where('product_id', $data->id)->delete();

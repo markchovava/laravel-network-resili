@@ -24,6 +24,7 @@ class ProductResource extends JsonResource
             'price' => $this->price,
             'quantity' => $this->quantity,
             'status' => $this->status,
+            'priority' => $this->priority,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'brand' => new BrandResource($this->whenLoaded('brand_id')),

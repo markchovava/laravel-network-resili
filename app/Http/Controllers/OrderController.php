@@ -2,15 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\OrderDetailResource;
+use App\Http\Resources\OrderItemResource;
 use App\Http\Resources\OrderResource;
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
+    
     public function generateRandomText($length = 8) {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $shuffled = str_shuffle($characters);
@@ -36,8 +42,24 @@ class OrderController extends Controller
         return OrderResource::collection($data);
     }
 
+
+    public function indexByStatus($status){
+        if(!empty($status)) {
+            $data = Order::with(['user'])
+                    ->where('status', $status)
+                    ->orderBy('created_at', 'DESC')
+                    ->paginate(12)
+                    ->withQueryString();
+            return OrderResource::collection($data);
+        }
+         $data = Order::with(['user'])
+                ->orderBy('created_at', 'DESC')
+                ->paginate(12)
+                ->withQueryString();
+        return OrderResource::collection($data);
+    }
     public function index(){
-        $data = Order::with(['user', 'order_detail', 'order_items'])
+        $data = Order::with(['user'])
                 ->orderBy('created_at', 'DESC')
                 ->paginate(12)
                 ->withQueryString();
@@ -46,7 +68,7 @@ class OrderController extends Controller
 
     public function search($search){
         $data = Order::with(['user', 'order_detail', 'order_items'])
-                ->where('name', 'LIKE', '%' . $search . '%')
+                ->where('ref_no', 'LIKE', '%' . $search . '%')
                 ->orderBy('created_at', 'DESC')
                 ->paginate(12)
                 ->withQueryString();
@@ -54,6 +76,7 @@ class OrderController extends Controller
     }
 
     public function store(Request $request){
+        Log::info($request);
         $user_id = Auth::user()->id;
         $data = new Order();
         $data->user_id = $user_id;
@@ -61,7 +84,8 @@ class OrderController extends Controller
         $data->quantity = $request->quantity;
         $data->notes = $request->notes;
         $data->status = "Processing";
-        $data->ref = "REF" . date("Ymd") . $this->generateRandomText(4);
+        $data->is_agree = $request->is_agree;
+        $data->ref_no = "REF" . date("Ymd") . $this->generateRandomText(4);
         $data->created_at = now();
         $data->updated_at = now();
         $data->save();
@@ -77,20 +101,24 @@ class OrderController extends Controller
         $detail->updated_at = now();
         $detail->save();
         /*  */
-        $items = json_decode($request->order_items, true);
-        for( $i = 0; $i < count($items); $i++) {
-            $oi = new OrderItem();
-            $oi->user_id = $user_id;
-            $oi->order_id = $data->id;
-            $oi->product_id = $request->product_id;
-            $oi->name = $items[$i]['name'];
-            $oi->quantity = $items[$i]['quantity'];
-            $oi->price = $items[$i]['price'];
-            $oi->total = $items[$i]['total'];
-            $oi->created_at = now();
-            $oi->updated_at = now();
-            $oi->save();
+        if (!empty($request->cartitems)) {
+            foreach ($request->cartitems as $item) {
+                $oi = new OrderItem();
+                $oi->user_id = $user_id;
+                $oi->order_id = $data->id;
+                $oi->product_id = $item['product_id'];
+                $oi->quantity = $item['quantity'];
+                $oi->price = $item['price'];
+                $oi->total = $item['total'];
+                $oi->save();
+            }
         }
+        /*  */
+        if($request->has('cart_id') && Cart::where('id', $request->cart_id)->exists()){
+            Cart::find($request->cart_id)->delete();
+            CartItem::where('cart_id', $request->cart_id)->delete();
+        }
+        /*  */
         return response()->json([
             'message' => "Data saved successfully.",
             'data' => new OrderResource($data),
@@ -142,9 +170,19 @@ class OrderController extends Controller
     }
 
     public function view($id){
-        $data = Order::with(['user', 'order_detail', 'order_items'])
+        $order = Order::with(['user'])
                 ->find($id);
-        return new OrderResource($data);
+        $detail = OrderDetail::where('order_id', $id)
+                ->first();
+        $items = OrderItem::with(['product'])
+                ->where('order_id', $id)
+                ->orderBy('updated_at', 'DESC')
+                ->get();
+        return response([
+            'order' => new OrderResource($order),
+            'detail' => new OrderDetailResource(($detail)),
+            'orderitems' => OrderItemResource::collection($items),
+        ]);
     }
 
     public function delete($id){
@@ -156,5 +194,6 @@ class OrderController extends Controller
             'status' => 1,
         ]);
     }
+
 
 }

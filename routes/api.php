@@ -3,6 +3,7 @@
 use App\Http\Controllers\AppInfoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderController;
@@ -45,6 +46,16 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     });
     Route::get('/brand-search/{search}', [BrandController::class, 'search']);
     Route::get('/brand-all', [BrandController::class, 'indexAll']);
+
+    /* CART */
+    Route::prefix('cart')->group(function() {
+        Route::get('/', [CartController::class, 'index']);
+        Route::post('/', [CartController::class, 'store']);
+        Route::get('/{id}', [CartController::class, 'view']);
+        Route::delete('/{id}', [CartController::class, 'delete']);
+    });
+    Route::get('/cart-all', [CartController::class, 'indexAll']);
+
     /* CATEGORY */
     Route::prefix('category')->group(function() {
         Route::get('/', [CategoryController::class, 'index']);
@@ -73,6 +84,10 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
         Route::post('/{id}', [OrderController::class, 'update']);
         Route::delete('/{id}', [OrderController::class, 'delete']);
     });
+    Route::post('/order-status/{id}', [OrderController::class, 'updateStatus']);
+    Route::get('/order-status/{status}', [OrderController::class, 'indexByStatus']);
+    Route::get('/order-search/{search}', [OrderController::class, 'search']);
+
     Route::get('/message-search/{search}', [OrderController::class, 'search']);
     Route::get('/message-all', [OrderController::class, 'indexAll']);
     /* PARTNER */
@@ -95,6 +110,9 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     });
     Route::get('/product-search/{search}', [ProductController::class, 'search']);
     Route::get('/product-all', [ProductController::class, 'indexAll']);
+    Route::get('/product-sort/{sort}', [ProductController::class, 'indexBySort']);
+    Route::get('/product-search-category-id', [ProductController::class, 'searchNameCategory']);
+    Route::get('/product-by-priority', [ProductController::class, 'indexPriority']);
     /* PRODUCT IMAGE */
     Route::prefix('product-image')->group(function() {
         Route::delete('/{id}', [ProductImageController::class, 'delete']);
@@ -106,6 +124,7 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
         Route::get('/{id}', [ProductCategoryController::class, 'view']);
         Route::delete('/{id}', [ProductCategoryController::class, 'delete']);
     });
+    Route::get('/index-by-category/{id}', [ProductCategoryController::class, 'indexByCategory']);
     Route::get('/index-by-product/{id}', [ProductCategoryController::class, 'indexByProduct']);
 
     /* USER */
