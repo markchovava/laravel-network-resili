@@ -66,6 +66,7 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     });
     Route::get('/category-search/{search}', [CategoryController::class, 'search']);
     Route::get('/category-all', [CategoryController::class, 'indexAll']);
+    
     /* MESSAGE */
     Route::prefix('message')->group(function() {
         Route::get('/', [MessageController::class, 'index']);
@@ -76,6 +77,10 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     });
     Route::get('/message-search/{search}', [MessageController::class, 'search']);
     Route::get('/message-all', [MessageController::class, 'indexAll']);
+    Route::get('/message-by-user', [MessageController::class, 'indexByUser']);
+    Route::get('/message-by-status/{status}', [MessageController::class, 'indexByStatus']);
+    Route::post('/message-by-status/{id}', [MessageController::class, 'updateStatus']);
+
     /* ORDER */
     Route::prefix('order')->group(function() {
         Route::get('/', [OrderController::class, 'index']);
@@ -86,6 +91,9 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     });
     Route::post('/order-status/{id}', [OrderController::class, 'updateStatus']);
     Route::get('/order-status/{status}', [OrderController::class, 'indexByStatus']);
+    Route::get('/order-by-user', [OrderController::class, 'indexByUser']);
+    Route::get('/order-by-user-status/{status}', [OrderController::class, 'indexByUserStatus']);
+    Route::get('/order-by-user-search/{search}', [OrderController::class, 'searchByUser']);
     Route::get('/order-search/{search}', [OrderController::class, 'search']);
 
     Route::get('/message-search/{search}', [OrderController::class, 'search']);

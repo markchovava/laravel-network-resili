@@ -16,8 +16,9 @@ return new class extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->mediumInteger('user_id')->nullable();
+            $table->string('name')->nullable();
             $table->string('title')->nullable();
-            $table->longText('content')->nullable();
+            $table->longText('message')->nullable();
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->string('status')->nullable();

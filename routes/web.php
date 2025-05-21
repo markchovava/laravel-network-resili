@@ -68,8 +68,7 @@ Route::prefix('message')->group(function() {
     Route::post('/', [MessageController::class, 'store']);
     Route::get('/{id}', [MessageController::class, 'view']);
 });
-Route::get('/message-search/{search}', [MessageController::class, 'search']);
-Route::get('/message-all', [MessageController::class, 'indexAll']);
+
 /* ORDER */
 Route::prefix('order')->group(function() {
     Route::get('/', [OrderController::class, 'index']);
@@ -77,6 +76,8 @@ Route::prefix('order')->group(function() {
 });
 Route::get('/message-search/{search}', [OrderController::class, 'search']);
 Route::get('/message-all', [OrderController::class, 'indexAll']);
+Route::get('/message-by-status/{status}', [MessageController::class, 'indexByStatus']);
+Route::post('/message-by-status/{id}', [MessageController::class, 'updateStatus']);
 /* PARTNER */
 Route::prefix('partner')->group(function() {
     Route::get('/', [PartnerController::class, 'index']);

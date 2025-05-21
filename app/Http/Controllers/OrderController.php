@@ -35,6 +35,45 @@ class OrderController extends Controller
         ]);
     }
 
+    public function indexByUser(){
+        $user_id = Auth::user()->id;
+        $data = Order::with(['user'])
+                ->where('user_id', $user_id)
+                ->orderBy('created_at', 'DESC')
+                ->get();
+        return OrderResource::collection($data);
+    }
+
+    public function indexByUserStatus($status){
+        $user_id = Auth::user()->id;
+        if(!empty($status)) {
+            $data = Order::with(['user'])
+                    ->where('user_id', $user_id)
+                    ->where('status', $status)
+                    ->orderBy('created_at', 'DESC')
+                    ->paginate(12)
+                    ->withQueryString();
+            return OrderResource::collection($data);
+        }
+         $data = Order::with(['user'])
+                ->where('user_id', $user_id)
+                ->orderBy('created_at', 'DESC')
+                ->paginate(12)
+                ->withQueryString();
+        return OrderResource::collection($data);
+    }
+
+    public function searchByUser($search){
+        $user_id = Auth::user()->id;
+        $data = Order::with(['user', 'order_detail', 'order_items'])
+                ->where('user_id', $user_id)
+                ->where('ref_no', 'LIKE', '%' . $search . '%')
+                ->orderBy('created_at', 'DESC')
+                ->paginate(12)
+                ->withQueryString();
+            return OrderResource::collection($data);
+    }
+
     public function indexAll(){
         $data = Order::with(['user'])
                 ->orderBy('created_at', 'DESC')
