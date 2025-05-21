@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 17, 2025 at 06:16 PM
+-- Generation Time: May 21, 2025 at 02:51 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -101,6 +101,38 @@ CREATE TABLE `cache_locks` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `carts`
+--
+
+CREATE TABLE `carts` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `cart_ref` varchar(255) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `total` decimal(9,2) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart_items`
+--
+
+CREATE TABLE `cart_items` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `cart_id` mediumint(11) DEFAULT NULL,
+  `price` decimal(9,2) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `total` decimal(9,2) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `categories`
 --
 
@@ -185,14 +217,23 @@ CREATE TABLE `job_batches` (
 CREATE TABLE `messages` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `user_id` mediumint(9) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `content` longtext DEFAULT NULL,
+  `message` longtext DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`id`, `user_id`, `name`, `title`, `message`, `phone`, `email`, `status`, `created_at`, `updated_at`) VALUES
+(7, 3, 'James', 'FROM CONTACT FORM', 'k[pkp[', '0782210021', 'james.com', 'Read', '2025-05-21 08:35:46', '2025-05-21 09:07:48'),
+(8, NULL, 'Mark Chovava', 'FROM CONTACT FORM', 'mn[o[n[', '0782210021', 'markchovava@gmail.com', 'Unread', '2025-05-21 09:08:18', '2025-05-21 09:08:18');
 
 -- --------------------------------------------------------
 
@@ -221,12 +262,14 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (8, '2025_05_14_130403_create_products_table', 1),
 (9, '2025_05_14_130421_create_orders_table', 1),
 (10, '2025_05_14_130441_create_partners_table', 1),
-(11, '2025_05_14_130453_create_messages_table', 1),
 (12, '2025_05_14_130529_create_order_items_table', 1),
 (13, '2025_05_14_130540_create_order_details_table', 1),
 (14, '2025_05_14_132457_create_product_images_table', 1),
 (15, '2025_05_14_132508_create_product_specs_table', 1),
-(16, '2025_05_14_144530_create_product_categories_table', 2);
+(16, '2025_05_14_144530_create_product_categories_table', 1),
+(17, '2025_05_19_164823_create_carts_table', 2),
+(18, '2025_05_19_164828_create_cart_items_table', 2),
+(20, '2025_05_14_130453_create_messages_table', 3);
 
 -- --------------------------------------------------------
 
@@ -240,11 +283,20 @@ CREATE TABLE `orders` (
   `total` decimal(12,2) DEFAULT NULL,
   `quantity` int(11) DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL,
+  `is_agree` varchar(255) DEFAULT NULL,
   `notes` longtext DEFAULT NULL,
   `ref_no` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`id`, `user_id`, `total`, `quantity`, `status`, `is_agree`, `notes`, `ref_no`, `created_at`, `updated_at`) VALUES
+(6, 3, 2.00, 2, 'Processing', 'Yes', 'Test', 'REF20250520hJ37', '2025-05-19 11:51:27', '2025-05-20 11:51:27'),
+(7, 3, 4.00, 4, 'In-Transit', 'Yes', 'fasydf', 'REF20250520MPUy', '2025-05-20 13:18:16', '2025-05-20 13:31:55');
 
 -- --------------------------------------------------------
 
@@ -264,6 +316,14 @@ CREATE TABLE `order_details` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `order_details`
+--
+
+INSERT INTO `order_details` (`id`, `order_id`, `user_id`, `name`, `phone`, `email`, `address`, `created_at`, `updated_at`) VALUES
+(6, 6, 3, 'Admin', '123', 'admin@email.com', '88 Piers Road, Borrowdale', '2025-05-20 11:51:27', '2025-05-20 11:51:27'),
+(7, 7, 3, 'Admin', '123', 'admin@email.com', '88 Piers Road, Borrowdale', '2025-05-20 13:18:16', '2025-05-20 13:18:16');
+
 -- --------------------------------------------------------
 
 --
@@ -282,6 +342,15 @@ CREATE TABLE `order_items` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `order_items`
+--
+
+INSERT INTO `order_items` (`id`, `user_id`, `order_id`, `product_id`, `name`, `price`, `quantity`, `total`, `created_at`, `updated_at`) VALUES
+(3, 3, 6, 39, NULL, 1, 2, 2, '2025-05-20 11:51:27', '2025-05-20 11:51:27'),
+(4, 3, 7, 42, NULL, 1, 2, 2, '2025-05-20 13:18:16', '2025-05-20 13:18:16'),
+(5, 3, 7, 38, NULL, 1, 2, 2, '2025-05-20 13:18:16', '2025-05-20 13:18:16');
 
 -- --------------------------------------------------------
 
@@ -342,7 +411,7 @@ CREATE TABLE `personal_access_tokens` (
 
 INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
 (1, 'App\\Models\\User', 3, 'admin@email.com', '7beb5caa1ea17889d47bcdbd22743e1fdf21b71c4d8006b8902f7894107892e7', '[\"*\"]', NULL, NULL, '2025-05-15 12:32:28', '2025-05-15 12:32:28'),
-(4, 'App\\Models\\User', 3, 'admin@email.com', '3726b60740e706acbe69d56e2a02979801f226aa3e915ef4a697792f4b322f78', '[\"*\"]', '2025-05-17 14:13:44', NULL, '2025-05-15 14:19:46', '2025-05-17 14:13:44');
+(4, 'App\\Models\\User', 3, 'admin@email.com', '3726b60740e706acbe69d56e2a02979801f226aa3e915ef4a697792f4b322f78', '[\"*\"]', '2025-05-21 10:02:28', NULL, '2025-05-15 14:19:46', '2025-05-21 10:02:28');
 
 -- --------------------------------------------------------
 
@@ -359,6 +428,7 @@ CREATE TABLE `products` (
   `price` decimal(9,2) DEFAULT NULL,
   `quantity` mediumint(9) DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL,
+  `priority` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -367,60 +437,60 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `user_id`, `brand_id`, `name`, `description`, `price`, `quantity`, `status`, `created_at`, `updated_at`) VALUES
-(38, NULL, NULL, '24 Port Cuddy PoE', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(39, NULL, NULL, '16 Port Cuddy PoE Switch', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(40, NULL, NULL, '24 Port reyee gig poe switch', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(41, NULL, NULL, '16 port reyee gig poe switch', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(42, NULL, NULL, '8 port gig poe switch', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(43, NULL, NULL, '24 port cat6 patch panel', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(44, NULL, NULL, '1u brudh tide', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(45, NULL, NULL, 'double faceplates cat6', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(46, NULL, NULL, 'single faceplate cat6 ', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(47, NULL, NULL, 'cat6 utp indoor cable', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(48, NULL, NULL, '3m flyleads cat6', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(49, NULL, NULL, '1m patch cords cat6 ', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(50, NULL, NULL, '0.5 patch cord cat6 ', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(51, NULL, NULL, 'rj45 connectors ', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(52, NULL, NULL, 'Boots', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(53, NULL, NULL, 'Ubiquiti U6 Pro', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(54, NULL, NULL, 'Ubiquiti U6 LR', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(55, NULL, NULL, 'Ubiquiti U6 +', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(56, NULL, NULL, 'Ubiquiti U6 Lite', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(57, NULL, NULL, 'Nanostation M5', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(58, NULL, NULL, 'Nanostation M2', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(59, NULL, NULL, 'Tp-link adsl modem+router', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(60, NULL, NULL, 'gpon huawei router', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(61, NULL, NULL, 'ruckus t310', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(62, NULL, NULL, 'ruckus r510', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(63, NULL, NULL, 'mikrotik routers', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(64, NULL, NULL, 'Tenda Dual Band AC 6dBi 4 Port Gigabit Router', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(65, NULL, NULL, 'Reyee Dual Band WiFi 6 3000Mbps Gigabit Ceiling Mount AP', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(66, NULL, NULL, 'Ubiquiti UISP airMAX PowerBeam AC 5GHz 25dBi Radio', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(67, NULL, NULL, 'Gigabit Ethernet Media Converter', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(68, NULL, NULL, 'fiber patch panel', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(69, NULL, NULL, 'fiber patch cords', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(70, NULL, NULL, 'gpon huawei modems', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(71, NULL, NULL, 'pigtails', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(72, NULL, NULL, 'midcouplers', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(73, NULL, NULL, 'splice protectors', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(74, NULL, NULL, 'RJ 45 Connector', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(75, NULL, NULL, 'Grandstream UCM 6302', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(76, NULL, NULL, 'yealink t31p', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(77, NULL, NULL, 'yealink t46u', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(78, NULL, NULL, 'grandstream 1625', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(79, NULL, NULL, 'yeaster s20', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(80, NULL, NULL, 'yeaster p550', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(81, NULL, NULL, 'fxo modules', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(82, NULL, NULL, 'fxs modules', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(83, NULL, NULL, 'krone modules', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(84, NULL, NULL, 'rj11 connectors', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(85, NULL, NULL, 'line cord', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(86, NULL, NULL, 'panasonic ts500', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(87, NULL, NULL, 'hmt cable', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(88, NULL, NULL, 'rj11 sockets', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(89, NULL, NULL, 'Hikvision 8 CH DVR', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
-(90, NULL, NULL, 'Growatt 5kva Invertor', NULL, NULL, NULL, NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09');
+INSERT INTO `products` (`id`, `user_id`, `brand_id`, `name`, `description`, `price`, `quantity`, `status`, `priority`, `created_at`, `updated_at`) VALUES
+(38, NULL, NULL, '24 Port Cuddy PoE', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(39, NULL, NULL, '16 Port Cuddy PoE Switch', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(40, NULL, NULL, '24 Port reyee gig poe switch', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(41, NULL, NULL, '16 port reyee gig poe switch', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(42, NULL, NULL, '8 port gig poe switch', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(43, NULL, NULL, '24 port cat6 patch panel', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(44, NULL, NULL, '1u brudh tide', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(45, NULL, NULL, 'double faceplates cat6', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(46, NULL, NULL, 'single faceplate cat6 ', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(47, NULL, NULL, 'cat6 utp indoor cable', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(48, NULL, NULL, '3m flyleads cat6', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(49, NULL, NULL, '1m patch cords cat6 ', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(50, NULL, NULL, '0.5 patch cord cat6 ', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(51, NULL, NULL, 'rj45 connectors ', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(52, NULL, NULL, 'Boots', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(53, NULL, NULL, 'Ubiquiti U6 Pro', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(54, NULL, NULL, 'Ubiquiti U6 LR', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(55, NULL, NULL, 'Ubiquiti U6 +', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(56, NULL, NULL, 'Ubiquiti U6 Lite', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(57, NULL, NULL, 'Nanostation M5', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(58, NULL, NULL, 'Nanostation M2', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(59, NULL, NULL, 'Tp-link adsl modem+router', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(60, NULL, NULL, 'gpon huawei router', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(61, NULL, NULL, 'ruckus t310', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(62, NULL, NULL, 'ruckus r510', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(63, NULL, NULL, 'mikrotik routers', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(64, NULL, NULL, 'Tenda Dual Band AC 6dBi 4 Port Gigabit Router', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(65, NULL, NULL, 'Reyee Dual Band WiFi 6 3000Mbps Gigabit Ceiling Mount AP', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(66, NULL, NULL, 'Ubiquiti UISP airMAX PowerBeam AC 5GHz 25dBi Radio', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(67, NULL, NULL, 'Gigabit Ethernet Media Converter', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(68, NULL, NULL, 'fiber patch panel', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(69, NULL, NULL, 'fiber patch cords', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(70, NULL, NULL, 'gpon huawei modems', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(71, NULL, NULL, 'pigtails', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(72, NULL, NULL, 'midcouplers', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(73, NULL, NULL, 'splice protectors', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(74, NULL, NULL, 'RJ 45 Connector', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(75, NULL, NULL, 'Grandstream UCM 6302', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(76, NULL, NULL, 'yealink t31p', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(77, NULL, NULL, 'yealink t46u', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(78, NULL, NULL, 'grandstream 1625', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(79, NULL, NULL, 'yeaster s20', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(80, NULL, NULL, 'yeaster p550', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(81, NULL, NULL, 'fxo modules', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(82, NULL, NULL, 'fxs modules', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(83, NULL, NULL, 'krone modules', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(84, NULL, NULL, 'rj11 connectors', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(85, NULL, NULL, 'line cord', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(86, NULL, NULL, 'panasonic ts500', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(87, NULL, NULL, 'hmt cable', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(88, NULL, NULL, 'rj11 sockets', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(89, NULL, NULL, 'Hikvision 8 CH DVR', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09'),
+(90, NULL, NULL, 'Growatt 5kva Invertor', NULL, 1.00, NULL, 'IN-STOCK', NULL, '2025-05-17 15:48:09', '2025-05-17 15:48:09');
 
 -- --------------------------------------------------------
 
@@ -547,20 +617,69 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('08EAKGWDfeUN8T2HSltmbMtGkRQqNE02jwNA8g7k', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiTDNOdXF1ZDF5cFkzY3kyUkVlWlBFalZCNnpibFFsZFE4S0tKVk5mQyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747325142),
-('5BkVDb1f4nZHzuFCuWpfhJf51ruQmvKDLf8S0neT', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiZmE5TVBCdlVSUTdUNjNnZm1HY2U4RGRuV3l5U2twMUFWTWRWWTRyVSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747325151),
-('9NpWc7A6AT07qCC8d9YjusptRinMXyiHJw1Dac0Q', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiYWY0dXVHN1BwTTA1R29Edkd1d25oZGo4RjBjSTRpQWt4NlA3bjRSNiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747319496),
-('EFBzorr3cGcs2sVGz1iBaa4oyr4hL3VbDNxagsjy', NULL, '127.0.0.1', '', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiN3FGencwTkFLMm1hQm1MeU96enNJcWo3bFRBNWgyVmE4dzZUdHNSbCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747489084),
-('ELk21OCy5dCOaxXMl6xiraIkhdWqeSoB1CVZyX34', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiczltM3lqVUFVbVVoZzRrYjRrclhLRmVCcTdIcUhQUHg5TlBXRGZzRiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747490850),
-('EpzDpwH8iaju04W3i0eiX2h5ZEgolDxuCYAohGfJ', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiT2JJMTBrVFpLSDN4N01YaHJkU1N3Y2NPejNNS3REcTNCRXZvbWdjayI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747319445),
-('mdVz4YMmquemh9m8MF03bIoLSRZkckZQOPyusfE8', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiYkZ4OHk0b0tDT3RwaEJQYTh3STFhTzdBMUtyQXpnWndNSmR2dDhPYyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747319589),
-('qgAzHHqcaXvGlgfoSQKpqwRxkCAlflXOFcYkMish', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiNTBYRUxuVWhtWjlsSEdoNkNsRUQwZURMeGxVdEVEOU90RDB0WDNrdCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747490894),
-('R3V7XXlDssLxVwZJbdIazV2MSdDZsqAigIs2aZoc', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiaUdLdlNVUFh5Q05ubWhYVlNzMUt1R3BDN3IxVjJXN2Z3aldjVHdCeiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747490857),
-('RSlXBw6rrJ8nyZ5Lm2Vc6dI7TF5XdTsx7F4hBco1', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiakxSOUN1QXZxWmw5YzFkcjdReEU1ZUdVWHpvcHBOM2JBRm5KWFJrayI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747325986),
-('tkMkAl9oLzlnuyDpF2ttITxkfRjxoammkGJpo3cg', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibjdhT0ZEblVtZUxtWVRJbmJUM1VWMDZKVmhNWlVTaFdBWGNhdGNYMiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LWNhdGVnb3J5LzgiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1747488491),
-('u02GTSjAa2dy0KtrvFzkKZcqvNhyNOyRELwN2vfC', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiRGRMM3hkZHBUbVhDRzZ2NTRSS29RU0w5ZWEyQXU4dDRzTXA4UEhKMCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747490977),
-('UAWb9Kr1q2jJb6188ukWkkptCbd2CF7QNvsmIWhX', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiWE1sNWV4M0ltOHZtU0I5Y2pkVGtrVHVMaXNhS0JlZnZhcWNpUXVkSSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747490935),
-('x2Gmj5xZzs9rtMu9aATQ3Ivn7pd2pGhXV0n0xrv6', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiMlNocEJ4R2NzQWZwbGJiWERzSGlMWkRRbU0zbUc2bnNuYTZVUzRudiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747319548);
+('0m5wHkCyHig6VgIIGPwyP7WesHMnUFU3Zwth64ey', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiRmd1NVdWb0V2TTc0MU9CZE83M1hIU0dVRFVvU0RBcXhYaHByc3lGTSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754249),
+('21Ns57gK016JOQZ3Y94pj5SHKaCmpoLX9syBdwKt', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibUQyMXY4M2tYbFFUTjZVMXF5MkoyZWdtWE5jUjN5anJ0anVoTUl5VSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LWJ5LXByaW9yaXR5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754242),
+('2HdKnuCPmpHnOF0qnGSa3PP6sf7x4bn2TKoPRV8N', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiT0huWTZGV25DVHc2SWluNXJXNkhnQlpBY2hxYUVENWQyRXJwQmZ4MyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747822348),
+('33gvE5JB1ilxiwBQx5jbiQ4IdlDY9Whd1jFMqmmc', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiM0xOUWh1OWFrc2NNR3gwNHM5WHY5TXRvcFEzNUNOWG15VU9tZVY1ZyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU1Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749059),
+('5l40a6xo8h6A9JOGDU0dx7BI5h6VK9pK7BAUrfLV', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoieHpPRjdQUUFFWktzQkVNMzlDakE2RXdyYWtxOElFNk1sdU10Mm9WZiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LzM5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749037),
+('64N1LJnziRZbcv4sjV9W7UaFp2BMHUxP7Qoh9y4P', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRndMSDVzV2JCeXI5dTBNbDRGQU1xU1g3anV3UzhKb3VjZU93bWJPQiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LzQyIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754268),
+('6X3GzqXJfmJf7Nvvd9fAIE4zguEkHAGnU4tIqH8A', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNUJETGQ3Qm1pTGpqUTVFYlMyOXR2VVBFWWdEcWRHOWpuNjBTelhxdCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LzM4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754249),
+('9vadtiQJgq5WSSE7qzNcp0xkJgi1xZ5sVu6KEFCr', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiZ0lqUm1ub2pMbGNOYnZoaXE0ZFpuZUlYTTNMR3BuN0tvUzZsdmk3cSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747823673),
+('aVAw8Ob0hqg7PshUHe8GxSTp0lYRuUGadnS3v4QP', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiaG1SeFpaUm8xbExMSDhzVUJKaHpObmg2eW43eTdJV3R4Q2JrSXo1eCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9tZXNzYWdlLWJ5LXN0YXR1cy9VbnJlYWQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1747827041),
+('b0gouP2ul1haNTzeaWavcz7VGXQk8zJvuRbd4sEr', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoidDhRWHhPQk5mYkdMNVBuWUJVUWRpWHU3YWl6Z01KR2lyY1VNR21mZyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbmRleC1ieS1wcm9kdWN0LzQyIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754263),
+('Bf0CPgGWbcwWA7oXX8IJFIHNQnzmIwnGCl2QrhXs', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiTDRCS0czczY3OWRFVFV6NWlvSXdXUW9hYmpoUlp3ajVTeFVCRENMTyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU1Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749067),
+('BqqoYmKgIxVsOKNEYp3mvZRI6KtZ8ehbdCPpNCW5', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRVlRaERMMlB3YnpKTkFMRVdjZTFuOERpWnNTbnJNOEtjSzJyQjhXcCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbmRleC1ieS1wcm9kdWN0LzM5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749037),
+('bsWWP8c42zwRUn7F0EFYKSVkEhKhWd1RXcxWc58u', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiTXJlSXJyMzZHcDJ1eEU2Y2JmeDAzWlZwTkNaeUtZaTM5NTBnMjFPeSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXRlZ29yeS1hbGwiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1747747405),
+('cJr40GfHn99HOWnt8Gtw6qYfMXPzp9kLKHxRmtCP', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoidXY3b3ZxNWVwWWFzdENLZzgyZHpDTTc4MUJLRzdOZXdMcldhMXdIVSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LzM4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754241),
+('CJz8Hd5eoJD5yvXbwiJUXmYTayT63spyxOZ4hOWm', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoienJMb1hQZDJrQXEzUG5FdTNPYUtzNDd6dW83bmhONGppdUlHQTJTRSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXRlZ29yeS1hbGwiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1747749008),
+('CqGcY1t7Bptu0l71VLs02p7UORYEN5PrBf5jELyu', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQWVrdFNQYmp0NUdTQ0l5SjdzbmE2eUcySnllRlJHejBQS0NhcWRSYSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747829104),
+('DAh34kL1zTG2NZtsOTDCPSDwuIGH1X20uRLmNaDw', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiT2JPSGpQOU1Fa25WR0ZxVzdlckRld2FzM1ZEWnFZQnhSYnRpSlpveiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LzM5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749048),
+('dAYiY4mwwcFv8gVPNkH0dPTPjWmRKS5r71H0Ombs', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiOEZXNEpUbnByZmVZSTBhY1BGekdGRXU3d3pOekVtMHJpNElqaTc5NiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754277),
+('dChAIiWIN0LLdp3iAG8RCtEKBCMiAjoV60rruLHy', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiV0V1YU9ZbWxRV2JMWVU1N0RxNTFTUllqUlFhQTc0NlFQS0kzcEFqTCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754296),
+('DFpR0has7kGtMcshH0zZw99fDfBVIMvsnKdFiSk0', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicmJpcnBJcVp3V3pGRFd4Y294ckoyWHRnZmN6SUZTVGREa3JoR3ZRZCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754237),
+('DJYxZZYXIVqEGQwFPKGX259bu9vDO9joEfjVPrR6', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQjVjWE1TQ3lob202d2xiSXBxUGVaMjhURjB6cExlckhrdjB0cXEwZCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU1Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749060),
+('ePuO3Pf1wBhFVCwfYtPGygjmh385nGPQejyqIPlM', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiVGdtR0s1d3BxVGlTNEJDNHl5TVQzYnNNN1hZempRODRBaVlCUVVYVCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749066),
+('EQCc77DFRM6ClXMeu1XimRlv8SPUm7cCeY83KR7i', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiTnBITXgwR1FIbjhOYkRqYTdMQTRxeXFEQXpmYXU1bjh3TmFnZW9JQSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754276),
+('fpTWqltnA7vVIQM2Ie8UebXDj0F9BnWh9JasS5OS', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiR3B5MGZnV0x3Z1FCRlBqOExZNk5NQVNQMlRtbGFic1VHaEpHV0dxOSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbmRleC1ieS1wcm9kdWN0LzM4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754250),
+('gcYDkD7UIpdApWhB78ugpMJ98tmOQ1Qc1oY4KfmG', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiR21yY1FyQWtEY3FsMmtRU1pjekNUMEEyZ014YzV1aWRKYlZNb2dZTiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbmRleC1ieS1wcm9kdWN0LzM5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749049),
+('GHfCXzEouq27R33desSagj1U90QjxW52UvPoU0YS', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNFhtR1JBOTNVN1ZqNk83dnBJMTV2a0VySFVScVZidmdTR251OVk5TCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU2Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749077),
+('GrwJQqzUNn7j0gUNmzPCdUpkobWrSV3W9oBnuVPt', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoibEtnbWJnZWFUR0FodGZ4bFM2ZEVKb3ZHbm9SOURCbjh4VHBIZVc5RyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747822274),
+('hEqRMQMwHVHK5WpCX7JwB9jUTDFnXNTRh5CU0RLY', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoieVdTRjQ3bnZOQnByazBEQXdIbVJUSmZmQmNObHk3YUVNR1JxV3VqViI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU3Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754271),
+('HQ5at0WP0KW7mbTQ9Xf9LvMZlMOFHpzRpQPspYtT', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiODR3UGRWSUd1RTVTQVFPMzlCYkljcHN5S0k1NURXNlFlczBOS1BxeSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LWJ5LXByaW9yaXR5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749036),
+('izT1RlpoEbUbNGue70o3tr5mpqgPpItIUlwCE0gh', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiY2hCYXZwNXdZWEVDWEQ1Wklrb0VUNWNsWUYwa1pOVVoybTBXc1p3WiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749048),
+('j0zPHAjhiUIHnUvMpWA6YGedy6zpxKusgV860zdh', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiV0Zpc0RwcVRLd09PbGtHTjFnTXhZQ284bXdiTGZQUWNkZFlOdHRjayI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU3Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754270),
+('jGtzlFjLeEv1SDnrJsrDOKnL4qMHehwv5GcrRdWJ', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiVEN1cHFwMHpVSHVkM2VwdGNrMDN5ZkdiTWltUVhTNXBUb2h3UENWeSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747822661),
+('jMtme5dMY0lmqit0IAZTaN5ZiD99vxvMV9itR8Ok', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibHg4REtBeU9EbnpFRjEzRmgyME82dkxyYzdUUDBqa0pERnJwd3Z6UiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754257),
+('jNLiwRx0klUs6CS29cqx5K26wafpc0QbKVpbl9eL', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicElNY3RVcGU3YnJyMkFsZlB3amc3OUM5d2liMDg1bkduY2Zmc25WMCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LzM5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749035),
+('KekXVTVyPVYwVKq7m1YkypYaMkVtohpJBHFPmH5o', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibHpzcml2NVI1dkpKelJWOUcxQkFOVzNRQ3FsZmdSOHZqZkFvdktWZSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU2Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749072),
+('lPyPaYGmMazvKahjQJobkEd7viQaMBuoAMMws7Vn', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRGtTQlJob0VXUXRIdTBCaTlQRldsR1MwUmZZa1NpSVl3VzIwWFd1cyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747747239),
+('MirZOEIJbfcn2c7OKyQz4sYxsyW11wPCffemEPmN', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiVzRoQXhjQko2Z1RXZlNKeDlPbzRpTVN4UXNvSGVRdFA4TDJvOUZLSyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747822411),
+('nELBG5ybVIYVXQ8ojlP80iW57IYEWN9xkfpTnzLK', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoicDhXSlNjMjFDcXBDRUFmQ25zcndxcHhYVVJERnV6bVRLUEdQV3ZmTSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXRlZ29yeS1hbGwiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1747747133),
+('nmcOgpu5pb8N13GbAzUQsra5SCjDES1R0SmgLMjh', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibWphMmpCZmJJekdYWUJtWkRFZjRhT0ltWUg4YUcydzJTbk92SnMxUyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXRlZ29yeS1hbGwiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1747747238),
+('noUBg6GFAWRvA1AVc3RLXrYo3J4t5UxZz4qAt49s', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiYU5GMU5QUmVZZnMwVmZLUmlIRHZmVlZCNlcwZlpRUXA4OVR5R2NjQyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXRlZ29yeS1hbGwiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1747829103),
+('nqLbWOTvcpRTvEte61V4OCQ0v77gPHcqF5WrW1DK', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiTVgzV1FoYzlZaGRsVWhjVlhhWmVxM2tCanRjeGxjbW56SkE4czdGSCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbmRleC1ieS1wcm9kdWN0LzM5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749035),
+('nxgAsoYFc7JMh4VNlo5mk4iy6MlkHLKEfGcubbYg', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiWDdtRWtHVkFoU1hFN3pVcWdrbGdwemFpV0dLYkM2blhEREZ5UkNiYiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754268),
+('Ocq60DyrUSxX726aGBarcqyU2Q8HmTGqXZYREItS', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiWldCeUVmS0V5RGd0ZE1Vc1hXSkpvUGZQZDZjcTQ4UkFDRlp5UDZSMiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU3Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754252),
+('PE29PeQPju2k6pWVkRwKrPUurFIDTbTgH0IunFjS', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoidnFSYmdlRDI1SW1EZFlFWnNRaUFSN0JuU09yeUF5clM2dzJJTlFYMCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LWJ5LXByaW9yaXR5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749049),
+('Pikty9dcL9LW08Cmb53jT6ymKELSP97TQ5gSVzBk', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiU0w5OXp4eWI2QUdSWXpjV2lFbGpXSFJ4bDdiWWt3RmpXMTF1aUhvayI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754279),
+('QBorzFabas3u964ychxMrhZMHuZjGrPTRJYRtZeT', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiMGhaRmlzYk5KclIzOTZOajBnNWI0N1VwRjJRT3JuWnlCcjRlZ0plVSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU3Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754276),
+('QBRflmedcf8Krsmnzs3uIOt3bUHcHWWWSYsoIys3', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoib2tkYVk4SkRwM2VvenduRmtRWE9Qbjk2WUpmRHlmRGUxQjZKeVZMQyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LWJ5LXByaW9yaXR5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754269),
+('qfq882Rmtm0i5aNhBB6sw0PJZBIKxoMu7i3Ry24f', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiTkhNT3BNYnZHOWJ3NEZGTXlJc2N3VW1oMFRhSVlseFEwMGJKNVZQOSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LWJ5LXByaW9yaXR5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754263),
+('sgLDZfLO3J9mpdkSojSkozjIVH97dCOzltVvlUqx', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiVGVZWFhIRzZ1alhBSWlsbnZzbDBwQU80Q0E1TGZiSGg3azd4ejA3RCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747823746),
+('UG8fcUVSe7vTfsYGIMNLV1xMMfgCNuCu4NflO8Ag', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiN1hDNnI3bWw3aEN1bjdYSjdZRnU0cFFSNkhMUU83T3JSb0c0ZjBpYSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LzQyIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754262),
+('uKwWZu7imF4IEB6KIpII362K5Vq0oN6alPwG8GO8', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiWHU0bTVpU0YzVUtKZXFubmM0M1FJOVJnVmhxZTdjZHNXVlBrZE1wciI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LWJ5LXByaW9yaXR5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749038),
+('VNV2Id9KfhDR8z1LHqDS4rES4DopFSZo2twh3yzB', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNUQwZlo2WDl2QUMwOE1GUHhTTUp1TTBWeDdtR21wOUNPeUtlQm5vayI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbmRleC1ieS1wcm9kdWN0LzQyIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754269),
+('wwbK74xgMYiHFZQQVhfFYNrnWdUmlWwCDPSntJux', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiYW85UTVId3g0d3NHNk1xVklIbzN2S1hmWUhweFRvRTFCSVFueG1NSCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0LWJ5LXByaW9yaXR5Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754250),
+('xdn8oKszGZTJdDmJk3GC5w0d6qZoBreZCfw5R7X2', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNlJSeXRCTXZ1dHBzTnMzOUlJa2ZjVkNjWUJnOU9tZXIyU1h2RlltRiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbmRleC1ieS1wcm9kdWN0LzM4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754242),
+('Xf5n6qtGqDSLLEo8wJnz9odXFJId7a6OwNueUJUN', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQzlzb3pIQWJhUzZRUDVhUjhlMjBRSUpZa1NNWmVXSzlHeTdFVkpQbSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749008),
+('xkDnpsf3gn7EtKuKQY8Zn6NRvLtPstVi1jyj0SQg', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiVUxlNm5sV0tOdFVWZUpnTVhwRTlVbWlHWmhwSGhLZ3dQZHBQTWdqNSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747822437),
+('xkJgaXKfTVuOPxEnGHIBgrfRodvnHJfTrgs9DyLj', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiS1dpUmg4VGt6MzZCM2Zhb0dEeHhodEJaRXF3dnZhdHBlTFdLQlpLbCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747747134),
+('xNqlLMQ7S9qfuz0gugt5RyjYkNAuJ5ZZctpHd1X9', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiS1NqWWlYeW1wV09UOVRtbm83cDFvSk1SZXQ2RDU4Q1lRUzRrVnE0NCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXRlZ29yeS1hbGwiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1747754258),
+('yE9DBPUmUM8WbVeHQzlU8SpjhSmJQ0PX2mEQpKuQ', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQkRZQ3RwVER5aUdscVBYVHg4eGdqeUhFRGhvTVB1OXBtRzZCMUN5byI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU2Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747749088),
+('yvhr0dAr6KvHBgUinA2hhMhxGsJEP1YVDVcI6BvJ', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiUU1NQUc2WmdUMDZobksyc3lvV0ZjQlhpSHNFSjZrTGcyQzhMQW1NcCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9kdWN0Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747747404),
+('zdHNHMWG4ZbHqlkqIcBDiqn1N0SMx746fXy9gbfw', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoibndwa2xXMjk1MjF4MmxINnlPQm12WDF3UWRlRUt0aGloY1BvVGlDZCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzQ6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXRlZ29yeS1hbGwiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19', 1747754238),
+('ZJcV5IyfkAxO2rcPWNQEgahNb93jVFd9zXIwKxcX', NULL, '127.0.0.1', 'node', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoiVlVxVzlyck1qUU11ZTJYSGxuQUpEbGpZbTIzQ094Z0lVWlNQUWlzayI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747825698),
+('zNDbwSe7SzTqjMNNiMIvjoAcYusyUN2AbXBri8RT', NULL, '127.0.0.1', 'node', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiQjRZcFF5VGRFWXBZNmJWRjNJTk1nRjdKY0UxS3NUaUU5SVFRa3lsSyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9jYXJ0LzU3Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1747754251);
 
 -- --------------------------------------------------------
 
@@ -618,6 +737,18 @@ ALTER TABLE `cache`
 --
 ALTER TABLE `cache_locks`
   ADD PRIMARY KEY (`key`);
+
+--
+-- Indexes for table `carts`
+--
+ALTER TABLE `carts`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `categories`
@@ -751,6 +882,18 @@ ALTER TABLE `brands`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `carts`
+--
+ALTER TABLE `carts`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+
+--
+-- AUTO_INCREMENT for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+
+--
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
@@ -772,31 +915,31 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `partners`
