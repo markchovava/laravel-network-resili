@@ -95,7 +95,8 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     Route::get('/order-by-user-status/{status}', [OrderController::class, 'indexByUserStatus']);
     Route::get('/order-by-user-search/{search}', [OrderController::class, 'searchByUser']);
     Route::get('/order-search/{search}', [OrderController::class, 'search']);
-
+    Route::get('/order-track-search/{search}', [OrderController::class, 'searchOrderTrack']);
+    /*  */
     Route::get('/message-search/{search}', [OrderController::class, 'search']);
     Route::get('/message-all', [OrderController::class, 'indexAll']);
     /* PARTNER */

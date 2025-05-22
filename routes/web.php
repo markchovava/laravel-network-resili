@@ -74,6 +74,9 @@ Route::prefix('order')->group(function() {
     Route::get('/', [OrderController::class, 'index']);
     Route::get('/{id}', [OrderController::class, 'view']);
 });
+Route::get('/order-track-search/{search}', [OrderController::class, 'searchOrderTrack']);
+
+
 Route::get('/message-search/{search}', [OrderController::class, 'search']);
 Route::get('/message-all', [OrderController::class, 'indexAll']);
 Route::get('/message-by-status/{status}', [MessageController::class, 'indexByStatus']);

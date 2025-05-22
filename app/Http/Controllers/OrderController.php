@@ -23,6 +23,20 @@ class OrderController extends Controller
         return substr($shuffled, 0, $length);
     }
 
+    public function searchOrderTrack($search) {
+        if($search) {
+            $data = Order::with(['user'])
+                    ->where('ref_no', 'LIKE', '%' . $search . '%')
+                    ->orderBy('created_at', 'DESC')
+                    ->paginate(12)
+                    ->withQueryString();
+            return OrderResource::collection($data);
+        }
+        return response()->json([
+            'data' => [],
+        ]);
+    }
+
     public function updateStatus(Request $request, $id){
         $data = Order::find($id);
         $data->status = $request->status;
@@ -106,8 +120,15 @@ class OrderController extends Controller
     }
 
     public function search($search){
+        if($search) {
+            $data = Order::with(['user', 'order_detail', 'order_items'])
+                    ->where('ref_no', 'LIKE', '%' . $search . '%')
+                    ->orderBy('created_at', 'DESC')
+                    ->paginate(12)
+                    ->withQueryString();
+            return OrderResource::collection($data);
+        }
         $data = Order::with(['user', 'order_detail', 'order_items'])
-                ->where('ref_no', 'LIKE', '%' . $search . '%')
                 ->orderBy('created_at', 'DESC')
                 ->paginate(12)
                 ->withQueryString();
