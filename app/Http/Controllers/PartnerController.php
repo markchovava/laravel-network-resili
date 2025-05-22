@@ -13,9 +13,8 @@ class PartnerController extends Controller
 
     public function indexAll(){
         $data = Partner::with(['user'])
-                ->orderBy('created_at', 'DESC')
-                ->get()
-                ->withQueryString();
+                ->orderBy('updated_at', 'DESC')
+                ->get();
         return PartnerResource::collection($data);
     }
 
@@ -52,7 +51,7 @@ class PartnerController extends Controller
         $data->updated_at = now();
         $data->save();
         return response()->json([
-            'Partner' => "Data saved successfully.",
+            'message' => "Data saved successfully.",
             'data' => new PartnerResource($data),
             'status' => 1,
         ]);
@@ -81,7 +80,7 @@ class PartnerController extends Controller
         $data->updated_at = now();
         $data->save();
         return response()->json([
-            'Partner' => "Data saved successfully.",
+            'message' => "Data saved successfully.",
             'data' => new PartnerResource($data),
             'status' => 1,
         ]);
@@ -96,7 +95,7 @@ class PartnerController extends Controller
     public function delete($id){
         Partner::find($id)->delete();
         return response()->json([
-            'Partner' => "Data deleted successfully.",
+            'message' => "Data deleted successfully.",
             'status' => 1,
         ]);
     }
